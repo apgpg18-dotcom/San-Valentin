@@ -51,7 +51,8 @@ body::before {
   border-radius: 20px;
   display: flex;
   justify-content: center;
-  gap: 15px;
+  gap: 18px;
+  overflow: hidden;
 }
 
 #recuadro3 button {
@@ -62,16 +63,15 @@ body::before {
   cursor: pointer;
   transition: transform 0.45s ease-in-out, box-shadow 0.3s ease;
   box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-}
-
-#recuadro3 button:active {
-  transform: scale(0.95);
+  position: relative;
+  z-index: 2;
 }
 
 #btnYes {
   background: black;
   color: white;
-  transform-origin: center left;
+  transform-origin: center;
+  z-index: 3;
 }
 
 #btnNo {
@@ -101,7 +101,7 @@ body::before {
   }
 }
 
-/* Pantalla final */
+/* Final */
 #final {
   position: absolute;
   top: 50%; left: 50%;
@@ -157,7 +157,9 @@ const phrases = [
   "Yo sé que sí quieres",
   "Casi lo tienes",
   "Mi corazón dice que sí",
-  "DARYAN DALE A SÍ NO SEAS TERCA"
+  "DARYAN DALE A SÍ NO SEAS TERCA",
+  "Ya sabes cuál es la respuesta",
+  "Te dije que no tenías opción 🦁"
 ];
 
 function lanzarCorazones() {
@@ -189,18 +191,21 @@ btnNo.addEventListener('click', () => {
     container.insertBefore(btnNo, btnYes);
   } 
   else if (noCount === 8) {
-    btnYes.style.transform = 'scale(2.2)'; // crece de golpe sin tapar
+    btnYes.style.transform = 'scale(2)';
   } 
-  else {
+  else if (noCount < 12) {
     let grow = 1 + (noCount - 8) * 0.15;
     btnYes.style.transform = `scale(${grow})`;
     btnNo.style.transform = `scale(${Math.max(0.6, 2 - grow)})`;
   }
 
-  if (noCount <= phrases.length) {
+  if (noCount === 12) {
+    btnNo.textContent = "Sí 🫰🏻";
+    btnNo.style.background = "black";
+    btnNo.style.color = "white";
+    texto5.textContent = phrases[11];
+  } else if (noCount < phrases.length) {
     texto5.textContent = phrases[noCount - 1];
-  } else {
-    texto5.textContent = phrases[Math.floor(Math.random() * phrases.length)];
   }
 });
 
