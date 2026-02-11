@@ -66,13 +66,11 @@ body::before {
 #btnYes {
   background: black;
   color: white;
-  z-index: 3;
 }
 
 #btnNo {
   background: white;
   color: black;
-  z-index: 2;
 }
 
 #texto5 {
@@ -127,15 +125,6 @@ body::before {
   font-size: 1em;
   cursor: pointer;
 }
-
-/* Carta */
-#carta {
-  margin-top: 20px;
-  background: rgba(255,182,193,0.35);
-  padding: 25px;
-  border-radius: 25px;
-  text-align: left;
-}
 </style>
 </head>
 
@@ -166,7 +155,6 @@ const container = btnYes.parentNode;
 let noCount = 0;
 let swapped = false;
 let ambosSonSi = false;
-let escalaNoActual = 1;
 
 const phrases = [
   "Di que sí",
@@ -222,15 +210,7 @@ function aceptar() {
   document.body.appendChild(final);
 
   document.getElementById("btnCita").addEventListener("click", () => {
-    const carta = document.createElement("div");
-    carta.id = "carta";
-    carta.innerHTML = `
-      <strong>Daryan</strong><br><br>
-      Gracias por darle clic desde el primer sí, o eso espero,  
-      lo importante es que ya estás aquí...<br><br>
-      <strong>Viernes 13 de Febrero – 7pm – Seoullo</strong>
-    `;
-    final.appendChild(carta);
+    window.location.href = "cita.html";
   });
 }
 
@@ -243,27 +223,34 @@ btnNo.addEventListener("click", () => {
   noCount++;
   texto5.textContent = phrases[Math.min(noCount - 1, phrases.length - 1)];
 
-  // crecimiento desde el PRIMER clic
-  let crecimientoYes = 1 + noCount * 0.15;
-  let reduccionNo = Math.max(0.65, 1 - noCount * 0.08);
-
-  // después del intercambio → más notorio
-  if (swapped) {
-    crecimientoYes = 1 + noCount * 0.2;
-    reduccionNo = Math.max(escalaNoActual - 0.03, 0.7);
+  // 1–5: crecimiento inicial
+  if (noCount <= 5) {
+    btnYes.style.transform = `scale(${1 + noCount * 0.18})`;
+    btnNo.style.transform = `scale(${1 - noCount * 0.12})`;
+    latidoSuave();
   }
 
-  btnYes.style.transform = `scale(${crecimientoYes})`;
-  btnNo.style.transform = `scale(${reduccionNo})`;
-  escalaNoActual = reduccionNo;
+  // 6: reset
+  else if (noCount === 6) {
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+  }
 
-  latidoSuave();
-
-  if (noCount === 7 && !swapped) {
+  // 7: intercambio
+  else if (noCount === 7 && !swapped) {
     container.insertBefore(btnNo, btnYes);
     swapped = true;
   }
 
+  // 8+: crecimiento más notorio pero gradual
+  else {
+    const extra = noCount - 7;
+    btnYes.style.transform = `scale(${1 + extra * 0.22})`;
+    btnNo.style.transform = `scale(${Math.max(0.7, 1 - extra * 0.05)})`;
+    latidoSuave();
+  }
+
+  // último estado
   if (noCount === phrases.length) {
     ambosSonSi = true;
     btnYes.textContent = "Sí 🫰🏻";
@@ -280,4 +267,3 @@ btnYes.addEventListener("click", aceptar);
 
 </body>
 </html>
-
