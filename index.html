@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Valentín Interactivo</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  /* 👉 AQUÍ va tu imagen real */
+  background: url("fondo.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,192,203,0.5);
+}
+
+#recuadro2 {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255,182,193,0.4);
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+#recuadro2 h1 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: bold;
+}
+
+#recuadro2 p {
+  margin: 10px 0;
+  font-size: 1.2em;
+}
+
+#cajaPregunta {
+  background: rgba(255,255,255,0.2);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+#recuadro3 {
+  background: rgba(255,192,203,0.2);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+
+#recuadro3 button {
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 1em;
+}
+
+#btnYes {
+  background: black;
+  color: white;
+  border: none;
+}
+
+#btnNo {
+  background: white;
+  color: black;
+  border: none;
+}
+
+#texto5 {
+  margin-top: 10px;
+  font-size: 0.9em;
+}
+
+/* Corazones */
+.heart {
+  position: fixed;
+  top: -30px;
+  font-size: 1.5em;
+  color: red;
+  animation: fall 1.5s linear forwards;
+}
+
+@keyframes fall {
+  to { transform: translateY(110vh); opacity: 0; }
+}
+
+/* Pantalla final */
+#final {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  background: rgba(255,255,255,0.5);
+  padding: 20px;
+  text-align: center;
+  border-radius: 10px;
+}
+
+#final h1 {
+  margin: 0;
+  font-size: 2em;
+  color: red;
+}
+
+#final p {
+  margin: 10px 0;
+  font-size: 1.2em;
+}
+
+#final img {
+  width: 200px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="recuadro2">
+  <h1>Hola corazón 💌🦦</h1>
+  <p>Te tengo una pregunta...</p>
+
+  <div id="cajaPregunta">
+    ¿Quieres ser mi San Valentín? No acepto un no por respuesta...
+  </div>
+
+  <div id="recuadro3">
+    <button id="btnYes">Sí 🫰🏻</button>
+    <button id="btnNo">No</button>
+  </div>
+
+  <p id="texto5">Elige bien (no tienes opción)</p>
+</div>
+
+<script>
+// Corazones cayendo
+window.onload = function() {
+  for (let i = 0; i < 20; i++) {
+    let heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.innerText = '❤';
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDelay = (Math.random() * 1.5) + 's';
+    document.body.appendChild(heart);
+  }
+
+  setTimeout(() => {
+    document.querySelectorAll('.heart').forEach(h => h.remove());
+  }, 1500);
+};
+
+// Botones
+let noCount = 0;
+const btnYes = document.getElementById('btnYes');
+const btnNo = document.getElementById('btnNo');
+const texto5 = document.getElementById('texto5');
+
+const phrases = [
+  "Di que sí",
+  "Por favor dale a sí",
+  "Sabemos que quieres darle un sí",
+  "Si le das a sí te doy una mordida",
+  "¡Ándale canelita chapopote!",
+  "Ya casi darás a sí",
+  "Yo sé que sí quieres",
+  "Casi lo tienes",
+  "Mi corazón dice que sí",
+  "DARYAN DALE A SÍ NO SEAS TERCA"
+];
+
+btnNo.addEventListener('click', () => {
+  noCount++;
+
+  if (noCount <= 5) {
+    let scaleYes = 1 + noCount * 0.2;
+    let scaleNo = 1 - noCount * 0.2;
+
+    btnYes.style.transform = `scale(${scaleYes})`;
+    btnNo.style.transform = `scale(${scaleNo < 0 ? 0 : scaleNo})`;
+  } else {
+    let randScale = 1 + Math.random() * 3;
+    btnYes.style.transform = `scale(${randScale})`;
+    btnNo.style.transform = `scale(${1/randScale})`;
+
+    if (Math.random() < 0.5) {
+      let parent = btnYes.parentNode;
+      parent.insertBefore(btnNo, btnYes);
+    }
+  }
+
+  if (noCount <= 10) {
+    texto5.textContent = phrases[noCount - 1];
+  } else {
+    texto5.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+  }
+});
+
+btnYes.addEventListener('click', () => {
+  document.getElementById('recuadro2').remove();
+
+  const final = document.createElement('div');
+  final.id = 'final';
+  final.innerHTML = `
+    <h1>Siiiii ❤️</h1>
+    <p>Sabía que dirías que sí, te quiero muchooo</p>
+    <img src="gif.gif" alt="Bailando">
+  `;
+
+  document.body.appendChild(final);
+});
+</script>
+
+</body>
+</html>
+
