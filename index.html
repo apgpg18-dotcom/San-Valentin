@@ -27,7 +27,8 @@ body::before {
 
 #recuadro2 {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background: rgba(255,182,193,0.45);
   padding: 25px;
@@ -47,11 +48,12 @@ body::before {
 
 #recuadro3 {
   background: rgba(255,192,203,0.25);
-  padding: 20px;
-  border-radius: 20px;
+  padding: 18px;
+  border-radius: 22px;
   display: flex;
   justify-content: center;
   gap: 20px;
+  overflow: visible;
 }
 
 #recuadro3 button {
@@ -66,6 +68,7 @@ body::before {
 #btnYes {
   background: black;
   color: white;
+  z-index: 3;
 }
 
 #btnNo {
@@ -78,11 +81,18 @@ body::before {
   font-size: 0.95em;
 }
 
-/* Corazones */
+/* 💓 Latido MUY sutil */
+@keyframes heartbeat {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  50%  { transform: translate(-50%, -50%) scale(1.015); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ❤️ Corazones */
 .heart {
   position: fixed;
   top: -30px;
-  font-size: 1.5em;
+  font-size: 1.6em;
   color: red;
   animation: fall 2.5s ease-in forwards;
   pointer-events: none;
@@ -93,37 +103,6 @@ body::before {
     transform: translateY(110vh) rotate(20deg);
     opacity: 0;
   }
-}
-
-/* Latido */
-@keyframes heartbeat {
-  0%   { transform: translate(-50%, -50%) scale(1); }
-  40%  { transform: translate(-50%, -50%) scale(1.03); }
-  60%  { transform: translate(-50%, -50%) scale(1.01); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-/* Final */
-#final {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  background: rgba(255,255,255,0.6);
-  padding: 30px;
-  text-align: center;
-  border-radius: 25px;
-  max-width: 90%;
-}
-
-#final button {
-  margin-top: 15px;
-  padding: 12px 26px;
-  border-radius: 25px;
-  border: none;
-  background: black;
-  color: white;
-  font-size: 1em;
-  cursor: pointer;
 }
 </style>
 </head>
@@ -150,11 +129,11 @@ body::before {
 const btnYes = document.getElementById("btnYes");
 const btnNo = document.getElementById("btnNo");
 const texto5 = document.getElementById("texto5");
-const container = btnYes.parentNode;
+const container = document.getElementById("recuadro3");
+const box = document.getElementById("recuadro2");
 
 let noCount = 0;
 let swapped = false;
-let ambosSonSi = false;
 
 const phrases = [
   "Di que sí",
@@ -172,9 +151,7 @@ const phrases = [
 ];
 
 function latidoSuave() {
-  const box = document.getElementById("recuadro2");
-  if (!box) return;
-  box.style.animation = "heartbeat 0.35s ease";
+  box.style.animation = "heartbeat 0.6s ease";
   box.addEventListener("animationend", () => {
     box.style.animation = "";
   }, { once: true });
@@ -187,7 +164,6 @@ function lanzarCorazones() {
     h.textContent = "❤";
     h.style.left = Math.random() * 100 + "%";
     h.style.animationDelay = Math.random() * 0.8 + "s";
-    h.style.fontSize = 1.2 + Math.random() * 1.2 + "em";
     document.body.appendChild(h);
     h.addEventListener("animationend", () => h.remove());
   }
@@ -195,74 +171,74 @@ function lanzarCorazones() {
 
 window.onload = lanzarCorazones;
 
-function aceptar() {
+btnNo.addEventListener("click", () => {
+  noCount++;
+
+  if (noCount <= 5) {
+    btnYes.style.transform = `scale(${1 + noCount * 0.18})`;
+    btnNo.style.transform = `scale(${1 - noCount * 0.12})`;
+    latidoSuave();
+  } 
+  else if (noCount === 6) {
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+  } 
+  else if (noCount === 7 && !swapped) {
+    container.insertBefore(btnNo, btnYes);
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(0.75)";
+    swapped = true;
+  } 
+  else if (noCount > 7 && noCount < phrases.length) {
+    let grow = 1 + (noCount - 7) * 0.22;
+    btnYes.style.transform = `scale(${grow})`;
+    btnNo.style.transform = `scale(${Math.max(0.55, 1.5 - grow)})`;
+    latidoSuave();
+  }
+
+  if (noCount < phrases.length) {
+    texto5.textContent = phrases[noCount - 1];
+  }
+});
+
+btnYes.addEventListener("click", () => {
   lanzarCorazones();
   document.getElementById("recuadro2").remove();
 
   const final = document.createElement("div");
   final.id = "final";
+  final.style.cssText = `
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    background:rgba(255,255,255,0.6);
+    padding:25px;
+    border-radius:25px;
+    text-align:center;
+    backdrop-filter:blur(4px);
+  `;
+
   final.innerHTML = `
     <h1>Siiiii ❤️</h1>
     <p>Sabía que dirías que sí, te quiero muchooo</p>
-    <img src="dance-klenza.gif" width="200"><br>
-    <button id="btnCita">Cita 💌</button>
+    <img src="dance-klenza.gif" width="200"><br><br>
+    <a href="cita.html">
+      <button style="
+        padding:12px 26px;
+        border-radius:30px;
+        border:none;
+        background:black;
+        color:white;
+        font-size:1em;
+        cursor:pointer;">
+        Cita 💌
+      </button>
+    </a>
   `;
+
   document.body.appendChild(final);
-
-  document.getElementById("btnCita").addEventListener("click", () => {
-    window.location.href = "cita.html";
-  });
-}
-
-btnNo.addEventListener("click", () => {
-  if (ambosSonSi) {
-    aceptar();
-    return;
-  }
-
-  noCount++;
-  texto5.textContent = phrases[Math.min(noCount - 1, phrases.length - 1)];
-
-  // 1–5: crecimiento inicial
-  if (noCount <= 5) {
-    btnYes.style.transform = `scale(${1 + noCount * 0.18})`;
-    btnNo.style.transform = `scale(${1 - noCount * 0.12})`;
-    latidoSuave();
-  }
-
-  // 6: reset
-  else if (noCount === 6) {
-    btnYes.style.transform = "scale(1)";
-    btnNo.style.transform = "scale(1)";
-  }
-
-  // 7: intercambio
-  else if (noCount === 7 && !swapped) {
-    container.insertBefore(btnNo, btnYes);
-    swapped = true;
-  }
-
-  // 8+: crecimiento más notorio pero gradual
-  else {
-    const extra = noCount - 7;
-    btnYes.style.transform = `scale(${1 + extra * 0.22})`;
-    btnNo.style.transform = `scale(${Math.max(0.7, 1 - extra * 0.05)})`;
-    latidoSuave();
-  }
-
-  // último estado
-  if (noCount === phrases.length) {
-    ambosSonSi = true;
-    btnYes.textContent = "Sí 🫰🏻";
-    btnNo.textContent = "Sí 🫰🏻";
-    btnYes.style.transform = "scale(1)";
-    btnNo.style.transform = "scale(1)";
-    btnNo.style.background = "black";
-    btnNo.style.color = "white";
-  }
 });
-
-btnYes.addEventListener("click", aceptar);
 </script>
 
 </body>
