@@ -49,11 +49,13 @@ body::before {
   background: rgba(255,192,203,0.25);
   padding: 15px;
   border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
 
 #recuadro3 button {
   padding: 12px 24px;
-  margin: 8px;
   font-size: 1.05em;
   border-radius: 30px;
   border: none;
@@ -69,6 +71,7 @@ body::before {
 #btnYes {
   background: black;
   color: white;
+  transform-origin: center left;
 }
 
 #btnNo {
@@ -77,7 +80,7 @@ body::before {
 }
 
 #texto5 {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 0.95em;
 }
 
@@ -139,9 +142,23 @@ body::before {
 <script>
 const btnYes = document.getElementById('btnYes');
 const btnNo = document.getElementById('btnNo');
+const texto5 = document.getElementById('texto5');
 const container = btnYes.parentNode;
 
 let noCount = 0;
+
+const phrases = [
+  "Di que sí",
+  "Por favor dale a sí",
+  "Sabemos que quieres darle un sí",
+  "Si le das a sí te doy una mordida",
+  "¡Ándale canelita chapopote!",
+  "Ya casi darás a sí",
+  "Yo sé que sí quieres",
+  "Casi lo tienes",
+  "Mi corazón dice que sí",
+  "DARYAN DALE A SÍ NO SEAS TERCA"
+];
 
 function lanzarCorazones() {
   for (let i = 0; i < 18; i++) {
@@ -172,12 +189,18 @@ btnNo.addEventListener('click', () => {
     container.insertBefore(btnNo, btnYes);
   } 
   else if (noCount === 8) {
-    btnYes.style.transform = 'scale(3)';
+    btnYes.style.transform = 'scale(2.2)'; // crece de golpe sin tapar
   } 
   else {
     let grow = 1 + (noCount - 8) * 0.15;
     btnYes.style.transform = `scale(${grow})`;
     btnNo.style.transform = `scale(${Math.max(0.6, 2 - grow)})`;
+  }
+
+  if (noCount <= phrases.length) {
+    texto5.textContent = phrases[noCount - 1];
+  } else {
+    texto5.textContent = phrases[Math.floor(Math.random() * phrases.length)];
   }
 });
 
