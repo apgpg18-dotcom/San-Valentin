@@ -51,7 +51,7 @@ body::before {
   border-radius: 20px;
   display: flex;
   justify-content: center;
-  gap: 18px;
+  gap: 20px;
 }
 
 #recuadro3 button {
@@ -60,8 +60,7 @@ body::before {
   border-radius: 30px;
   border: none;
   cursor: pointer;
-  transition: transform 0.45s ease-in-out, box-shadow 0.3s ease;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  transition: transform 0.45s ease-in-out;
 }
 
 #btnYes {
@@ -91,7 +90,7 @@ body::before {
 
 @keyframes fall {
   to {
-    transform: translateY(110vh) rotate(15deg);
+    transform: translateY(110vh);
     opacity: 0;
   }
 }
@@ -105,13 +104,6 @@ body::before {
   padding: 25px;
   text-align: center;
   border-radius: 25px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-  backdrop-filter: blur(4px);
-}
-
-#final img {
-  margin-top: 15px;
-  border-radius: 18px;
 }
 </style>
 </head>
@@ -135,12 +127,14 @@ body::before {
 </div>
 
 <script>
-const btnYes = document.getElementById('btnYes');
-const btnNo = document.getElementById('btnNo');
-const texto5 = document.getElementById('texto5');
+const btnYes = document.getElementById("btnYes");
+const btnNo = document.getElementById("btnNo");
+const texto5 = document.getElementById("texto5");
+const contenedor = document.getElementById("recuadro3");
 
 let noCount = 0;
 let ambosSonSi = false;
+let yaIntercambiaron = false;
 
 const phrases = [
   "Di que sí",
@@ -159,19 +153,18 @@ const phrases = [
 
 function lanzarCorazones() {
   for (let i = 0; i < 18; i++) {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    heart.textContent = '❤';
-    heart.style.left = Math.random() * 100 + '%';
-    heart.style.animationDelay = Math.random() * 0.6 + 's';
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.textContent = "❤";
+    heart.style.left = Math.random() * 100 + "%";
     document.body.appendChild(heart);
-    heart.addEventListener('animationend', () => heart.remove());
+    heart.addEventListener("animationend", () => heart.remove());
   }
 }
 
 window.onload = lanzarCorazones;
 
-btnNo.addEventListener('click', () => {
+btnNo.addEventListener("click", () => {
   if (ambosSonSi) {
     aceptar();
     return;
@@ -179,42 +172,47 @@ btnNo.addEventListener('click', () => {
 
   noCount++;
 
-  // Frases en orden cíclico
   const index = (noCount - 1) % phrases.length;
   texto5.textContent = phrases[index];
 
-  // Animaciones (se mantienen)
   if (noCount <= 5) {
-    btnYes.style.transform = `scale(${1 + noCount * 0.18})`;
-    btnNo.style.transform = `scale(${1 - noCount * 0.12})`;
-  } else if (noCount === 6) {
-    btnYes.style.transform = 'scale(1)';
-    btnNo.style.transform = 'scale(1)';
-  } else if (noCount === 7) {
-    btnYes.after(btnNo);
-  } else if (noCount === 8) {
-    btnYes.style.transform = 'scale(2)';
+    btnYes.style.transform = `scale(${1 + noCount * 0.15})`;
+    btnNo.style.transform = `scale(${1 - noCount * 0.1})`;
   }
 
-  // Cuando llega a la ÚLTIMA frase
+  if (noCount === 6) {
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+  }
+
+  if (noCount === 7 && !yaIntercambiaron) {
+    contenedor.insertBefore(btnNo, btnYes);
+    yaIntercambiaron = true;
+  }
+
+  // Cuando llega a la última frase
   if (index === phrases.length - 1) {
     ambosSonSi = true;
+
+    btnYes.textContent = "Sí 🫰🏻";
     btnNo.textContent = "Sí 🫰🏻";
+
+    btnYes.style.transform = "scale(1)";
+    btnNo.style.transform = "scale(1)";
+
     btnNo.style.background = "black";
     btnNo.style.color = "white";
-    btnYes.style.transform = "scale(1.6)";
-    btnNo.style.transform = "scale(1.6)";
   }
 });
 
-btnYes.addEventListener('click', aceptar);
+btnYes.addEventListener("click", aceptar);
 
 function aceptar() {
   lanzarCorazones();
-  document.getElementById('recuadro2').remove();
+  document.getElementById("recuadro2").remove();
 
-  const final = document.createElement('div');
-  final.id = 'final';
+  const final = document.createElement("div");
+  final.id = "final";
   final.innerHTML = `
     <h1>Siiiii ❤️</h1>
     <p>Sabía que dirías que sí, te quiero muchooo</p>
@@ -226,4 +224,3 @@ function aceptar() {
 
 </body>
 </html>
-
