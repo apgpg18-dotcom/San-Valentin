@@ -61,7 +61,6 @@ body::before {
   border: none;
   cursor: pointer;
   transition: transform 0.45s ease;
-  position: relative;
 }
 
 #btnYes {
@@ -98,15 +97,44 @@ body::before {
   }
 }
 
+/* Latido */
+@keyframes heartbeat {
+  0%   { transform: translate(-50%, -50%) scale(1); }
+  40%  { transform: translate(-50%, -50%) scale(1.03); }
+  60%  { transform: translate(-50%, -50%) scale(1.01); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
 /* Final */
 #final {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%,-50%);
-  background: rgba(255,255,255,0.55);
-  padding: 25px;
+  background: rgba(255,255,255,0.6);
+  padding: 30px;
   text-align: center;
   border-radius: 25px;
+  max-width: 90%;
+}
+
+#final button {
+  margin-top: 15px;
+  padding: 12px 26px;
+  border-radius: 25px;
+  border: none;
+  background: black;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+/* Carta */
+#carta {
+  margin-top: 20px;
+  background: rgba(255,182,193,0.35);
+  padding: 25px;
+  border-radius: 25px;
+  text-align: left;
 }
 </style>
 </head>
@@ -138,6 +166,7 @@ const container = btnYes.parentNode;
 let noCount = 0;
 let swapped = false;
 let ambosSonSi = false;
+let escalaNoActual = 1;
 
 const phrases = [
   "Di que sí",
@@ -153,6 +182,15 @@ const phrases = [
   "Ya sabes cuál es la respuesta",
   "Te dije que no tenías opción 🦁"
 ];
+
+function latidoSuave() {
+  const box = document.getElementById("recuadro2");
+  if (!box) return;
+  box.style.animation = "heartbeat 0.35s ease";
+  box.addEventListener("animationend", () => {
+    box.style.animation = "";
+  }, { once: true });
+}
 
 function lanzarCorazones() {
   for (let i = 0; i < 18; i++) {
@@ -178,9 +216,22 @@ function aceptar() {
   final.innerHTML = `
     <h1>Siiiii ❤️</h1>
     <p>Sabía que dirías que sí, te quiero muchooo</p>
-    <img src="dance-klenza.gif" width="200">
+    <img src="dance-klenza.gif" width="200"><br>
+    <button id="btnCita">Cita 💌</button>
   `;
   document.body.appendChild(final);
+
+  document.getElementById("btnCita").addEventListener("click", () => {
+    const carta = document.createElement("div");
+    carta.id = "carta";
+    carta.innerHTML = `
+      <strong>Daryan</strong><br><br>
+      Gracias por darle clic desde el primer sí, o eso espero,  
+      lo importante es que ya estás aquí...<br><br>
+      <strong>Viernes 13 de Febrero – 7pm – Seoullo</strong>
+    `;
+    final.appendChild(carta);
+  });
 }
 
 btnNo.addEventListener("click", () => {
@@ -192,18 +243,27 @@ btnNo.addEventListener("click", () => {
   noCount++;
   texto5.textContent = phrases[Math.min(noCount - 1, phrases.length - 1)];
 
-  // crecimiento cíclico tipo inicio
-  const ciclo = (noCount - 1) % 5;
-  btnYes.style.transform = `scale(${1 + ciclo * 0.18})`;
-  btnNo.style.transform = `scale(${1 - ciclo * 0.12})`;
+  // crecimiento desde el PRIMER clic
+  let crecimientoYes = 1 + noCount * 0.15;
+  let reduccionNo = Math.max(0.65, 1 - noCount * 0.08);
 
-  // intercambio UNA vez
+  // después del intercambio → más notorio
+  if (swapped) {
+    crecimientoYes = 1 + noCount * 0.2;
+    reduccionNo = Math.max(escalaNoActual - 0.03, 0.7);
+  }
+
+  btnYes.style.transform = `scale(${crecimientoYes})`;
+  btnNo.style.transform = `scale(${reduccionNo})`;
+  escalaNoActual = reduccionNo;
+
+  latidoSuave();
+
   if (noCount === 7 && !swapped) {
     container.insertBefore(btnNo, btnYes);
     swapped = true;
   }
 
-  // último estado
   if (noCount === phrases.length) {
     ambosSonSi = true;
     btnYes.textContent = "Sí 🫰🏻";
@@ -220,3 +280,4 @@ btnYes.addEventListener("click", aceptar);
 
 </body>
 </html>
+
